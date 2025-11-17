@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viagens - Sistema de Viagens</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* (Estilos de Tema Light/Dark - Idênticos ao home.html) */
+        :root {
+            --light-bg: #f8f9fa; --light-card: #ffffff; --light-text: #212529;
+            --light-border: rgba(0, 0, 0, 0.075); --light-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+            --light-hover-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); color: var(--light-text); transition: background-color 0.3s ease, color 0.3s ease; }
+        .navbar { background-color: var(--light-card); box-shadow: 0 0.125rem 0.25rem var(--light-border); transition: background-color 0.3s ease, box-shadow 0.3s ease; }
+        [data-bs-theme="dark"] {
+            --light-bg: #1a1a1a; --light-card: #282828; --light-text: #dee2e6;
+            --light-border: rgba(255, 255, 255, 0.1); --light-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+            --light-hover-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+        }
+        .theme-toggle { font-size: 1.25rem; cursor: pointer; transition: color 0.3s ease; }
+        .theme-toggle:hover { color: var(--bs-primary); }
+        .theme-toggle .bi-sun-fill, .theme-toggle .bi-moon-stars-fill { transition: transform 0.3s ease-out; }
+        [data-bs-theme="dark"] .theme-toggle .bi-sun-fill { display: none; }
+        [data-bs-theme="light"] .theme-toggle .bi-moon-stars-fill { display: none; }
+
+        /* Estilo para os cards de Formulário e Tabela */
+        .content-card {
+            border: none;
+            border-radius: 0.75rem;
+            background-color: var(--light-card);
+            box-shadow: var(--light-shadow);
+            transition: all 0.3s ease;
+        }
+
+        /* Botão com gradiente e animação */
+        .btn-gradient {
+            background: linear-gradient(90deg, var(--bs-primary), #0062cc);
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+        }
+        .btn-gradient:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+        }
+
+        /* Inputs com transição suave */
+        .form-control, .form-select {
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Faz a tabela ter cantos arredondados */
+        .table-responsive {
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="home.html"><i class="bi bi-car-front-fill text-primary"></i> Sistema de Viagens</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="home.html"><i class="bi bi-house-door-fill"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="motoristas.html"><i class="bi bi-people-fill"></i> Motoristas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active fw-semibold" aria-current="page" href="/viagens"><i class="bi bi-geo-alt-fill"></i> Viagens</a>
+                    </li>
+                </ul>
+                <div classs="navbar-nav me-3">
+                    <a id="theme-toggle" class="nav-link theme-toggle"><i class="bi bi-sun-fill"></i><i class="bi bi-moon-stars-fill"></i></a>
+                </div>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i> Administrador</a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="#">Meu Perfil</a></li>
+                            <li><a class="dropdown-item" href="#">Configurações</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="/">Sair</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container-fluid mt-4">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2 fw-bold">Gerenciar Viagens Agendadas</h1>
+        </div>
+        
+        <div class="row g-4">
+            
+            <div class="col-lg-4">
+                <div class="card content-card p-4">
+                    <h5 class="fw-bold mb-4"><i class="bi bi-signpost-split-fill text-primary me-2"></i> Adicionar Viagem</h5>
+                    
+                    <form id="form-viagem">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="titulo" placeholder="Título da Viagem" required>
+                            <label for="titulo">Título da Viagem (Ex: Rota Centro)</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="local_partida" placeholder="Local de Partida">
+                            <label for="local_partida">Local de Partida</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="local_destino" placeholder="Local de Destino">
+                            <label for="local_destino">Local de Destino</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="date" class="form-control" id="data_viagem" placeholder="Data da Viagem" required>
+                            <label for="data_viagem">Data da Viagem *</label>
+                        </div>
+                        
+                        <div class="row g-2 mb-3">
+                            <div class="col-md">
+                                <div class="form-floating">
+                                    <input type="time" class="form-control" id="horario_estimado_partida" placeholder="Partida Est." required>
+                                    <label for="horario_estimado_partida">Horário de Partida *</label>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="form-floating">
+                                    <input type="time" class="form-control" id="horario_estimado_volta" placeholder="Volta Est.">
+                                    <label for="horario_estimado_volta">Horário de Volta (Opc.)</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" placeholder="Descrição (opcional)" id="descricao" style="height: 100px"></textarea>
+                            <label for="descricao">Descrição (opcional)</label>
+                        </div>
+                        
+                        <div id="alert-container-viagem"></div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-gradient btn-lg fw-semibold" id="btn-salvar-viagem">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                <i class="bi bi-check-circle-fill me-2 button-icon"></i>
+                                <span class="button-text">Salvar Viagem</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card content-card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Partida</th>
+                                        <th>Destino</th>
+                                        <th>Data / H. Partida</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                
+                                <tbody>
+                                    {% if not viagens %}
+                                    <tr>
+                                        <td colspan="6" class="text-center">Nenhuma viagem cadastrada.</td>
+                                    </tr>
+                                    {% endif %}
+                                    
+                                    {% for viagem in viagens %}
+                                    <tr>
+                                        <td>
+                                            <span class="fw-semibold">{{ viagem.titulo }}</span>
+                                            <small class="d-block text-muted">{{ viagem.descricao|truncate(50) if viagem.descricao else '' }}</small>
+                                        </td>
+                                        <td>{{ viagem.local_partida }}</td>
+                                        <td>{{ viagem.local_destino }}</td>
+                                        
+                                        <td>
+                                            {{ viagem.data_viagem.strftime('%d/%m/%Y') if viagem.data_viagem else 'N/A' }}
+                                            {% if viagem.horario_estimado_partida %}
+                                                <small class="d-block text-muted">{{ viagem.horario_estimado_partida.strftime('%H:%M') }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge rounded-pill 
+                                                {% if viagem.status == 'Atribuída' %} bg-success-subtle text-success-emphasis
+                                                {% elif viagem.status == 'Concluída' %} bg-secondary-subtle text-secondary-emphasis
+                                                {% else %} bg-warning-subtle text-warning-emphasis {% endif %}">
+                                                {{ viagem.status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-success btn-atribuir" 
+                                                    title="Atribuir Motorista"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#modalAtribuir"
+                                                    data-viagem-id="{{ viagem.id }}"
+                                                    data-viagem-titulo="{{ viagem.titulo }}">
+                                                <i class="bi bi-person-plus-fill"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil-fill"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash-fill"></i></button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+    </main>
+
+    <div class="modal fade" id="modalAtribuir" tabindex="-1" aria-labelledby="modalAtribuirLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAtribuirLabel">Atribuir Motorista</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-atribuicao">
+                        <input type="hidden" id="hidden-viagem-id" value="">
+                        
+                        <p>Atribuir motorista para a viagem: <br>
+                           <strong id="modal-viagem-titulo" class="text-primary"></strong>
+                        </p>
+
+                        <div class="form-floating mb-3">
+                            <select class="form-select" id="select-motorista" required>
+                                <option value="" selected disabled>Selecione um motorista...</option>
+                                {% for motorista in motoristas %}
+                                    <option value="{{ motorista.id }}">{{ motorista.nome }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="select-motorista">Motorista</label>
+                        </div>
+                        
+                        <div id="alert-container-atribuicao"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btn-salvar-atribuicao">Salvar Atribuição</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function() {
+            // ... (Script de tema - sem alterações) ...
+            const applyTheme = (theme) => { document.documentElement.setAttribute('data-bs-theme', theme); };
+            const toggleIcon = (theme) => {
+                const toggle = document.getElementById('theme-toggle');
+                if (toggle) {
+                    toggle.querySelector('.bi-sun-fill').style.display = theme === 'dark' ? 'none' : 'block';
+                    toggle.querySelector('.bi-moon-stars-fill').style.display = theme === 'dark' ? 'block' : 'none';
+                }
+            };
+            const getPreferredTheme = () => { return localStorage.getItem('theme') || 'light'; };
+            const currentTheme = getPreferredTheme();
+            applyTheme(currentTheme);
+            document.addEventListener('DOMContentLoaded', () => {
+                toggleIcon(currentTheme);
+                const themeToggle = document.getElementById('theme-toggle');
+                if (themeToggle) {
+                    themeToggle.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const newTheme = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+                        localStorage.setItem('theme', newTheme);
+                        applyTheme(newTheme);
+                        toggleIcon(newTheme);
+                    });
+                }
+            });
+        })();
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- Seção: Criar Viagem (Existente) ---
+            const form = document.getElementById('form-viagem');
+            const alertContainer = document.getElementById('alert-container-viagem'); // Container do form principal
+            const submitButton = document.getElementById('btn-salvar-viagem');
+            const buttonText = submitButton.querySelector('.button-text');
+            const buttonIcon = submitButton.querySelector('.button-icon');
+            const spinner = submitButton.querySelector('.spinner-border');
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                setLoading(true);
+
+                const data = {
+                    titulo: document.getElementById('titulo').value,
+                    descricao: document.getElementById('descricao').value,
+                    local_partida: document.getElementById('local_partida').value,
+                    local_destino: document.getElementById('local_destino').value,
+                    data_viagem: document.getElementById('data_viagem').value,
+                    horario_estimado_partida: document.getElementById('horario_estimado_partida').value,
+                    horario_estimado_volta: document.getElementById('horario_estimado_volta').value
+                };
+
+                fetch(window.location.pathname, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(result => {
+                    if (result.body.success) {
+                        // Passa o container correto para o showAlert
+                        showAlert(alertContainer, 'success', result.body.message);
+                        form.reset(); 
+                        setTimeout(() => { window.location.reload(); }, 1500);
+                    } else {
+                        // Passa o container correto para o showAlert
+                        showAlert(alertContainer, 'danger', result.body.message || 'Erro ao cadastrar viagem.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro no fetch (criar viagem):', error);
+                    showAlert(alertContainer, 'danger', 'Erro de rede. Não foi possível conectar ao servidor.');
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+            });
+
+            function setLoading(isLoading) {
+                if (isLoading) {
+                    submitButton.disabled = true;
+                    spinner.style.display = 'inline-block';
+                    buttonIcon.style.display = 'none';
+                    buttonText.textContent = 'Salvando...';
+                } else {
+                    submitButton.disabled = false;
+                    spinner.style.display = 'none';
+                    buttonIcon.style.display = 'inline-block';
+                    buttonText.textContent = 'Salvar Viagem';
+                }
+            }
+
+            // --- FUNÇÃO DE ALERTA CORRIGIDA ---
+            // (Agora aceita o 'container' como primeiro argumento)
+            function showAlert(container, type, message) {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = [
+                    `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+                    `   <div>${message}</div>`,
+                    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+                    '</div>'
+                ].join('');
+                container.innerHTML = ''; // Limpa o container específico
+                container.append(wrapper);
+            }
+
+            
+            // ======================================================
+            // NOVO: SCRIPT PARA (ATRIBUIR MOTORISTA)
+            // ======================================================
+            const modalAtribuir = document.getElementById('modalAtribuir');
+            const btnSalvarAtribuicao = document.getElementById('btn-salvar-atribuicao');
+            const alertContainerAtribuicao = document.getElementById('alert-container-atribuicao'); // Container do modal
+            
+            // 1. Prepara o Modal quando ele é aberto
+            modalAtribuir.addEventListener('show.bs.modal', function (event) {
+                // 'event.relatedTarget' é o botão que abriu o modal
+                const button = event.relatedTarget;
+                
+                // Pega os dados 'data-*' do botão
+                const viagemId = button.getAttribute('data-viagem-id');
+                const viagemTitulo = button.getAttribute('data-viagem-titulo');
+                
+                // Popula o modal com os dados da viagem
+                document.getElementById('hidden-viagem-id').value = viagemId;
+                document.getElementById('modal-viagem-titulo').textContent = viagemTitulo;
+                
+                // Limpa alertas antigos e reseta o select
+                alertContainerAtribuicao.innerHTML = '';
+                document.getElementById('select-motorista').selectedIndex = 0;
+            });
+
+            // 2. Salva a Atribuição (POST para /atribuicao/)
+            btnSalvarAtribuicao.addEventListener('click', function() {
+                const idViagem = document.getElementById('hidden-viagem-id').value;
+                const idMotorista = document.getElementById('select-motorista').value;
+                
+                // Sua rota /atribuicao/ espera 'id_admin_criador'
+                const idAdminCriador = 1; // Provisório (baseado no seu service)
+
+                if (!idMotorista) {
+                    showAlert(alertContainerAtribuicao, 'warning', 'Por favor, selecione um motorista.');
+                    return;
+                }
+
+                const data = {
+                    id_motorista: idMotorista,
+                    id_viagem: idViagem,
+                    id_admin_criador: idAdminCriador
+                };
+
+                // O fetch POST para /atribuicao/
+                // (Garanta que sua rota 'atribuicao_bp' está registrada em /atribuicao)
+                fetch('/atribuicao/', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(result => {
+                    // ATENÇÃO: Sua rota /atribuicao/ retorna "sucess" (1 s)
+                    if (result.status === 200 && result.body.sucess) { 
+                        showAlert(alertContainerAtribuicao, 'success', result.body.message);
+                        
+                        // Fecha o modal e recarrega a página
+                        setTimeout(() => {
+                            const modal = bootstrap.Modal.getInstance(modalAtribuir);
+                            modal.hide();
+                            window.location.reload();
+                        }, 1500);
+
+                    } else {
+                        // Trata erros (ex: motorista já atribuído, que daria erro 500 no DB)
+                         showAlert(alertContainerAtribuicao, 'danger', result.body.message || 'Erro ao atribuir motorista.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro no fetch (atribuir):', error);
+                    showAlert(alertContainerAtribuicao, 'danger', 'Erro de rede. Verifique o console.');
+                });
+            });
+
+        }); // Fim do DOMContentLoaded
+    </script>
+</body>
+</html>
