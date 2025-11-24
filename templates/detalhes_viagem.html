@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da Viagem #{{ viagem.id }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        .card { border: none; box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075); border-radius: 0.75rem; }
+        .timeline-item { position: relative; padding-left: 2rem; border-left: 2px solid #e9ecef; margin-bottom: 1rem; }
+        .timeline-item::before { 
+            content: ''; position: absolute; left: -0.4rem; top: 0.2rem; 
+            width: 0.8rem; height: 0.8rem; border-radius: 50%; background: #0d6efd; border: 2px solid #fff; 
+        }
+        .timeline-item.dest::before { background: #198754; }
+    </style>
+</head>
+<body>
+
+    <div class="container py-5">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a href="/home" class="text-decoration-none text-secondary mb-2 d-inline-block">
+                    <i class="bi bi-arrow-left"></i> Voltar para lista
+                </a>
+                <h2 class="fw-bold mb-0">Viagem: {{ viagem.titulo }}</h2>
+                <small class="text-muted">ID: #{{ viagem.id }}</small>
+            </div>
+            <div>
+                {% if viagem.status == 'Concluída' %}
+                    <span class="badge bg-secondary fs-6 px-3 py-2">Concluída</span>
+                {% elif viagem.status == 'Atribuída' %}
+                    <span class="badge bg-success fs-6 px-3 py-2">Agendada / Atribuída</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark fs-6 px-3 py-2">Pendente</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row g-4">
+            
+            <div class="col-lg-8">
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-transparent fw-bold py-3">
+                        <i class="bi bi-map-fill text-primary me-2"></i> Informações de Rota
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline-item">
+                            <small class="text-muted text-uppercase fw-bold">Partida</small>
+                            <h5 class="mt-1">{{ viagem.local_partida }}</h5>
+                            <div class="text-muted">
+                                <i class="bi bi-clock"></i> 
+                                {{ viagem.horario_estimado_partida.strftime('%H:%M') if viagem.horario_estimado_partida else '--:--' }}
+                            </div>
+                        </div>
+                        
+                        <div class="py-2"></div> <div class="timeline-item dest">
+                            <small class="text-muted text-uppercase fw-bold">Destino</small>
+                            <h5 class="mt-1">{{ viagem.local_destino }}</h5>
+                            <div class="text-muted">
+                                <i class="bi bi-clock"></i> 
+                                {{ viagem.horario_estimado_volta.strftime('%H:%M') if viagem.horario_estimado_volta else '--:--' }}
+                                <span class="badge bg-light text-dark ms-2">Previsão de Volta</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if viagem.descricao %}
+                <div class="card">
+                    <div class="card-header bg-transparent fw-bold py-3">
+                        <i class="bi bi-text-paragraph text-primary me-2"></i> Observações
+                    </div>
+                    <div class="card-body text-secondary">
+                        {{ viagem.descricao }}
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+
+            <div class="col-lg-4">
+                
+                <div class="card mb-4 text-center p-3">
+                    <div class="card-body">
+                        <h6 class="text-muted text-uppercase mb-3">Data da Viagem</h6>
+                        <h1 class="display-4 fw-bold text-primary mb-0">
+                            {{ viagem.data_viagem.strftime('%d') }}
+                        </h1>
+                        <p class="fs-5 text-uppercase fw-semibold text-secondary">
+                            {{ viagem.data_viagem.strftime('%B, %Y') }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header bg-transparent fw-bold py-3">
+                        <i class="bi bi-person-badge-fill text-primary me-2"></i> Motorista Responsável
+                    </div>
+                    <div class="card-body">
+                        {% if motorista %}
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle p-3 me-3 text-primary">
+                                    <i class="bi bi-person-fill fs-3"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-0">{{ motorista.nome }}</h5>
+                                    <small class="text-muted">{{ motorista.telefone or 'Sem telefone' }}</small>
+                                    <br>
+                                    <small class="text-muted">{{ motorista.email }}</small>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="d-grid">
+                                <a href="tel:{{ motorista.telefone }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-telephone-fill"></i> Ligar
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-3">
+                                <i class="bi bi-person-x fs-1 text-muted opacity-25"></i>
+                                <p class="text-muted mt-2">Nenhum motorista atribuído ainda.</p>
+                                <button class="btn btn-primary btn-sm" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#modalAtribuir"
+                                        data-viagem-id="{{ viagem.id }}"
+                                        data-viagem-titulo="{{ viagem.titulo }}"
+                                        data-viagem-data="{{ viagem.data_viagem }}">
+                                    Atribuir Agora
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-secondary"><i class="bi bi-pencil"></i> Editar Dados</button>
+                            <button class="btn btn-outline-danger"><i class="bi bi-trash"></i> Excluir Viagem</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

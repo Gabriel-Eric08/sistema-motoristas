@@ -10,11 +10,6 @@ login_bp = Blueprint('Login', __name__) # Cuidado com o nome do blueprint se tiv
 def login_page():
     return render_template('login.html')
 
-@login_bp.route('/home')
-def home_page():
-    # Rota para onde o JS redireciona
-    return render_template('home.html')
-
 @login_bp.route('/auth', methods=['POST'])
 def validate_login():
     data = request.get_json()

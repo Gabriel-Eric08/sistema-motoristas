@@ -49,3 +49,47 @@ class ViagemService:
             db.session.commit()
             return True
         return False
+    
+    def concluir(self,id_viagem):
+        if not id_viagem:
+            return False
+        concluir=self.repo.concluir(id_viagem)
+        if concluir:
+            db.session.commit()
+            return True
+        return False
+    
+    def existing(self,id_viagem):
+        if not id_viagem:
+            return False
+        existing=self.repo.existing(id_viagem)
+        if existing:
+            return True
+        return False
+    def get_by_motorista(self, id_motorista):
+        if not id_motorista:
+            return []
+        return self.repo.get_by_motorista(id_motorista)
+    def get_by_id(self, id_viagem):
+        if not id_viagem:
+            return None
+        return self.repo.get_by_id(id_viagem)
+    
+    def search(self, status, id_motorista, data_inicio_str, data_fim_str):
+        # Converter strings vazias para None
+        status = status if status else None
+        id_motorista = id_motorista if id_motorista else None
+        
+        # Converter datas (String -> Object)
+        dt_ini = None
+        dt_fim = None
+        
+        try:
+            if data_inicio_str:
+                dt_ini = datetime.strptime(data_inicio_str, '%Y-%m-%d').date()
+            if data_fim_str:
+                dt_fim = datetime.strptime(data_fim_str, '%Y-%m-%d').date()
+        except ValueError:
+            pass # Se a data vier errada, ignoramos o filtro
+
+        return self.repo.search(status, id_motorista, dt_ini, dt_fim)

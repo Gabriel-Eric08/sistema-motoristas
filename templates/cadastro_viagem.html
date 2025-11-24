@@ -3,158 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viagens - Sistema de Viagens</title>
+    <title>Gerenciar Viagens</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* (Estilos de Tema Light/Dark - Idênticos ao home.html) */
+        /* --- Estilos Globais --- */
         :root {
             --light-bg: #f8f9fa; --light-card: #ffffff; --light-text: #212529;
             --light-border: rgba(0, 0, 0, 0.075); --light-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
-            --light-hover-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
         }
-        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); color: var(--light-text); transition: background-color 0.3s ease, color 0.3s ease; }
-        .navbar { background-color: var(--light-card); box-shadow: 0 0.125rem 0.25rem var(--light-border); transition: background-color 0.3s ease, box-shadow 0.3s ease; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); color: var(--light-text); }
         [data-bs-theme="dark"] {
             --light-bg: #1a1a1a; --light-card: #282828; --light-text: #dee2e6;
-            --light-border: rgba(255, 255, 255, 0.1); --light-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
-            --light-hover-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+            --light-border: rgba(255, 255, 255, 0.1);
         }
-        .theme-toggle { font-size: 1.25rem; cursor: pointer; transition: color 0.3s ease; }
-        .theme-toggle:hover { color: var(--bs-primary); }
-        .theme-toggle .bi-sun-fill, .theme-toggle .bi-moon-stars-fill { transition: transform 0.3s ease-out; }
-        [data-bs-theme="dark"] .theme-toggle .bi-sun-fill { display: none; }
-        [data-bs-theme="light"] .theme-toggle .bi-moon-stars-fill { display: none; }
-
-        /* Estilo para os cards de Formulário e Tabela */
+        
+        /* Navbar e Cards */
+        .navbar { background-color: var(--light-card); box-shadow: 0 0.125rem 0.25rem var(--light-border); }
         .content-card {
-            border: none;
-            border-radius: 0.75rem;
-            background-color: var(--light-card);
-            box-shadow: var(--light-shadow);
-            transition: all 0.3s ease;
+            border: none; border-radius: 0.75rem;
+            background-color: var(--light-card); box-shadow: var(--light-shadow);
         }
 
-        /* Botão com gradiente e animação */
+        /* Botão Gradiente */
         .btn-gradient {
             background: linear-gradient(90deg, var(--bs-primary), #0062cc);
-            border: none;
-            color: white;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+            border: none; color: white; transition: all 0.3s ease;
         }
-        .btn-gradient:hover {
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
-        }
+        .btn-gradient:hover { transform: translateY(-2px); color: white; box-shadow: 0 4px 12px rgba(0, 98, 204, 0.3); }
 
-        /* Inputs com transição suave */
-        .form-control, .form-select {
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        /* Faz a tabela ter cantos arredondados */
-        .table-responsive {
-            border-radius: 0.5rem;
-            overflow: hidden;
-        }
+        /* Tabs Personalizadas */
+        .nav-tabs .nav-link { color: var(--light-text); border: none; border-bottom: 3px solid transparent; }
+        .nav-tabs .nav-link.active { color: var(--bs-primary); border-bottom: 3px solid var(--bs-primary); background: transparent; font-weight: 600; }
+        .nav-tabs .nav-link:hover { border-color: transparent; color: var(--bs-primary); }
+        
+        .table-responsive { border-radius: 0.5rem; overflow: hidden; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg sticky-top">
+    <nav class="navbar navbar-expand-lg sticky-top mb-4">
         <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="home.html"><i class="bi bi-car-front-fill text-primary"></i> Sistema de Viagens</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="home.html"><i class="bi bi-house-door-fill"></i> Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="motoristas.html"><i class="bi bi-people-fill"></i> Motoristas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active fw-semibold" aria-current="page" href="/viagens"><i class="bi bi-geo-alt-fill"></i> Viagens</a>
-                    </li>
-                </ul>
-                <div classs="navbar-nav me-3">
-                    <a id="theme-toggle" class="nav-link theme-toggle"><i class="bi bi-sun-fill"></i><i class="bi bi-moon-stars-fill"></i></a>
-                </div>
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i> Administrador</a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">Meu Perfil</a></li>
-                            <li><a class="dropdown-item" href="#">Configurações</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="/">Sair</a></li>
-                        </ul>
-                    </li>
-                </ul>
+            <a class="navbar-brand fw-bold" href="#"><i class="bi bi-car-front-fill text-primary"></i> Sistema Viagens</a>
+            <div class="d-flex align-items-center">
+                <button id="theme-toggle" class="btn btn-link nav-link me-3"><i class="bi bi-sun-fill"></i><i class="bi bi-moon-stars-fill" style="display:none;"></i></button>
+                <a href="/" class="btn btn-outline-danger btn-sm">Sair</a>
             </div>
         </div>
     </nav>
 
-    <main class="container-fluid mt-4">
-        
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h2 fw-bold">Gerenciar Viagens Agendadas</h1>
-        </div>
-        
+    <main class="container-fluid">
         <div class="row g-4">
             
             <div class="col-lg-4">
-                <div class="card content-card p-4">
-                    <h5 class="fw-bold mb-4"><i class="bi bi-signpost-split-fill text-primary me-2"></i> Adicionar Viagem</h5>
+                <div class="card content-card p-4 h-100">
+                    <h5 class="fw-bold mb-4"><i class="bi bi-plus-circle-fill text-primary me-2"></i> Nova Viagem</h5>
                     
                     <form id="form-viagem">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="titulo" placeholder="Título da Viagem" required>
-                            <label for="titulo">Título da Viagem (Ex: Rota Centro)</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="local_partida" placeholder="Local de Partida">
-                            <label for="local_partida">Local de Partida</label>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="local_destino" placeholder="Local de Destino">
-                            <label for="local_destino">Local de Destino</label>
-                        </div>
-
-                        <div class="form-floating mb-3">
-                            <input type="date" class="form-control" id="data_viagem" placeholder="Data da Viagem" required>
-                            <label for="data_viagem">Data da Viagem *</label>
+                            <input type="text" class="form-control" id="titulo" placeholder="Título" required>
+                            <label>Título da Viagem</label>
                         </div>
                         
                         <div class="row g-2 mb-3">
                             <div class="col-md">
                                 <div class="form-floating">
-                                    <input type="time" class="form-control" id="horario_estimado_partida" placeholder="Partida Est." required>
-                                    <label for="horario_estimado_partida">Horário de Partida *</label>
+                                    <input type="text" class="form-control" id="local_partida" placeholder="Partida">
+                                    <label>Partida</label>
                                 </div>
                             </div>
                             <div class="col-md">
                                 <div class="form-floating">
-                                    <input type="time" class="form-control" id="horario_estimado_volta" placeholder="Volta Est.">
-                                    <label for="horario_estimado_volta">Horário de Volta (Opc.)</label>
+                                    <input type="text" class="form-control" id="local_destino" placeholder="Destino">
+                                    <label>Destino</label>
                                 </div>
                             </div>
                         </div>
+
                         <div class="form-floating mb-3">
-                            <textarea class="form-control" placeholder="Descrição (opcional)" id="descricao" style="height: 100px"></textarea>
-                            <label for="descricao">Descrição (opcional)</label>
+                            <input type="date" class="form-control" id="data_viagem" required>
+                            <label>Data da Viagem</label>
+                        </div>
+                        
+                        <div class="row g-2 mb-3">
+                            <div class="col-md">
+                                <div class="form-floating">
+                                    <input type="time" class="form-control" id="horario_estimado_partida" required>
+                                    <label>Hora Partida</label>
+                                </div>
+                            </div>
+                            <div class="col-md">
+                                <div class="form-floating">
+                                    <input type="time" class="form-control" id="horario_estimado_volta">
+                                    <label>Hora Volta</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" id="descricao" style="height: 80px" placeholder="Desc"></textarea>
+                            <label>Descrição</label>
                         </div>
                         
                         <div id="alert-container-viagem"></div>
 
                         <div class="d-grid">
                             <button type="submit" class="btn btn-gradient btn-lg fw-semibold" id="btn-salvar-viagem">
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
-                                <i class="bi bi-check-circle-fill me-2 button-icon"></i>
+                                <span class="spinner-border spinner-border-sm d-none" role="status"></span>
                                 <span class="button-text">Salvar Viagem</span>
                             </button>
                         </div>
@@ -163,301 +120,332 @@
             </div>
 
             <div class="col-lg-8">
-                <div class="card content-card">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
+    <div class="card content-card h-100">
+        <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+            <ul class="nav nav-tabs card-header-tabs" id="viagensTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="pendentes-tab" data-bs-toggle="tab" data-bs-target="#pendentes" type="button" role="tab">
+                        <i class="bi bi-hourglass-split text-warning me-1"></i> Pendentes
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="atribuidas-tab" data-bs-toggle="tab" data-bs-target="#atribuidas" type="button" role="tab">
+                        <i class="bi bi-check-circle-fill text-success me-1"></i> Atribuídas
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card-body p-0">
+            <div class="tab-content p-4" id="viagensTabContent">
+                
+                <div class="tab-pane fade show active" id="pendentes" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Viagem</th>
+                                    <th>Rota</th>
+                                    <th>Data</th>
+                                    <th class="text-end" style="min-width: 140px;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if not viagens_pendentes %}
+                                <tr><td colspan="4" class="text-center text-muted py-4">Não há viagens pendentes.</td></tr>
+                                {% endif %}
                                 
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Título</th>
-                                        <th>Partida</th>
-                                        <th>Destino</th>
-                                        <th>Data / H. Partida</th>
-                                        <th>Status</th>
-                                        <th>Ações</th>
-                                    </tr>
-                                </thead>
-                                
-                                <tbody>
-                                    {% if not viagens %}
-                                    <tr>
-                                        <td colspan="6" class="text-center">Nenhuma viagem cadastrada.</td>
-                                    </tr>
-                                    {% endif %}
-                                    
-                                    {% for viagem in viagens %}
-                                    <tr>
-                                        <td>
-                                            <span class="fw-semibold">{{ viagem.titulo }}</span>
-                                            <small class="d-block text-muted">{{ viagem.descricao|truncate(50) if viagem.descricao else '' }}</small>
-                                        </td>
-                                        <td>{{ viagem.local_partida }}</td>
-                                        <td>{{ viagem.local_destino }}</td>
+                                {% for v in viagens_pendentes %}
+                                <tr>
+                                    <td>
+                                        <strong class="text-primary">{{ v.titulo }}</strong>
+                                        <div class="small text-muted">{{ v.descricao|truncate(20) }}</div>
+                                    </td>
+                                    <td>
+                                        <small>{{ v.local_partida }} <i class="bi bi-arrow-right"></i> {{ v.local_destino }}</small>
+                                    </td>
+                                    <td>
+                                        {{ v.data_viagem.strftime('%d/%m/%Y') }}<br>
+                                        <small class="text-muted">{{ v.horario_estimado_partida }}</small>
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-success me-1" 
+                                                title="Atribuir Motorista"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#modalAtribuir"
+                                                data-viagem-id="{{ v.id }}"
+                                                data-viagem-titulo="{{ v.titulo }}"
+                                                data-viagem-data="{{ v.data_viagem }}">
+                                            <i class="bi bi-person-plus-fill"></i>
+                                        </button>
                                         
-                                        <td>
-                                            {{ viagem.data_viagem.strftime('%d/%m/%Y') if viagem.data_viagem else 'N/A' }}
-                                            {% if viagem.horario_estimado_partida %}
-                                                <small class="d-block text-muted">{{ viagem.horario_estimado_partida.strftime('%H:%M') }}</small>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            <span class="badge rounded-pill 
-                                                {% if viagem.status == 'Atribuída' %} bg-success-subtle text-success-emphasis
-                                                {% elif viagem.status == 'Concluída' %} bg-secondary-subtle text-secondary-emphasis
-                                                {% else %} bg-warning-subtle text-warning-emphasis {% endif %}">
-                                                {{ viagem.status }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-success btn-atribuir" 
-                                                    title="Atribuir Motorista"
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#modalAtribuir"
-                                                    data-viagem-id="{{ viagem.id }}"
-                                                    data-viagem-titulo="{{ viagem.titulo }}">
-                                                <i class="bi bi-person-plus-fill"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-primary" title="Editar"><i class="bi bi-pencil-fill"></i></button>
-                                            <button class="btn btn-sm btn-outline-danger" title="Excluir"><i class="bi bi-trash-fill"></i></button>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </button>
+                                        
+                                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+
+                <div class="tab-pane fade" id="atribuidas" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Viagem</th>
+                                    <th>Motorista</th>
+                                    <th>Status</th>
+                                    <th class="text-end" style="min-width: 100px;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if not viagens_atribuidas %}
+                                <tr><td colspan="4" class="text-center text-muted py-4">Nenhuma viagem atribuída.</td></tr>
+                                {% endif %}
+
+                                {% for v in viagens_atribuidas %}
+                                <tr>
+                                    <td>
+                                        <span class="fw-bold">{{ v.titulo }}</span><br>
+                                        <small class="text-muted">{{ v.data_viagem.strftime('%d/%m') }}</small>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-person-badge text-primary"></i> {{ v.motorista_nome }}
+                                    </td>
+                                    <td>
+                                        {% if v.status == 'Concluída' %}
+                                            <span class="badge bg-secondary">Concluída</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Atribuída</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </button>
+
+                                        <button class="btn btn-sm btn-outline-danger" title="Excluir">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
+        </div>
+    </div>
+</div>
 
         </div>
-        
     </main>
 
-    <div class="modal fade" id="modalAtribuir" tabindex="-1" aria-labelledby="modalAtribuirLabel" aria-hidden="true">
+    <div class="modal fade" id="modalAtribuir" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalAtribuirLabel">Atribuir Motorista</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">Atribuir Motorista</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="form-atribuicao">
-                        <input type="hidden" id="hidden-viagem-id" value="">
-                        
-                        <p>Atribuir motorista para a viagem: <br>
-                           <strong id="modal-viagem-titulo" class="text-primary"></strong>
-                        </p>
+                        <input type="hidden" id="hidden-viagem-id">
+                        <input type="hidden" id="hidden-viagem-data"> 
+
+                        <div class="alert alert-info py-2">
+                            Atribuindo para: <strong id="modal-viagem-titulo"></strong>
+                        </div>
 
                         <div class="form-floating mb-3">
                             <select class="form-select" id="select-motorista" required>
-                                <option value="" selected disabled>Selecione um motorista...</option>
+                                <option value="" selected disabled>Selecione...</option>
                                 {% for motorista in motoristas %}
                                     <option value="{{ motorista.id }}">{{ motorista.nome }}</option>
                                 {% endfor %}
                             </select>
-                            <label for="select-motorista">Motorista</label>
+                            <label>Escolha o Motorista</label>
                         </div>
                         
                         <div id="alert-container-atribuicao"></div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary" id="btn-salvar-atribuicao">Salvar Atribuição</button>
                 </div>
             </div>
         </div>
     </div>
 
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
+        // 1. Lógica de Tema (Dark/Light)
         (function() {
-            // ... (Script de tema - sem alterações) ...
-            const applyTheme = (theme) => { document.documentElement.setAttribute('data-bs-theme', theme); };
-            const toggleIcon = (theme) => {
-                const toggle = document.getElementById('theme-toggle');
-                if (toggle) {
-                    toggle.querySelector('.bi-sun-fill').style.display = theme === 'dark' ? 'none' : 'block';
-                    toggle.querySelector('.bi-moon-stars-fill').style.display = theme === 'dark' ? 'block' : 'none';
-                }
-            };
-            const getPreferredTheme = () => { return localStorage.getItem('theme') || 'light'; };
-            const currentTheme = getPreferredTheme();
-            applyTheme(currentTheme);
-            document.addEventListener('DOMContentLoaded', () => {
-                toggleIcon(currentTheme);
-                const themeToggle = document.getElementById('theme-toggle');
-                if (themeToggle) {
-                    themeToggle.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const newTheme = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
-                        localStorage.setItem('theme', newTheme);
-                        applyTheme(newTheme);
-                        toggleIcon(newTheme);
-                    });
-                }
+            const toggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            
+            toggle.addEventListener('click', () => {
+                const current = html.getAttribute('data-bs-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-bs-theme', next);
+                toggle.querySelector('.bi-sun-fill').style.display = next === 'dark' ? 'none' : 'block';
+                toggle.querySelector('.bi-moon-stars-fill').style.display = next === 'dark' ? 'block' : 'none';
             });
+            // Set initial theme
+            html.setAttribute('data-bs-theme', 'light');
         })();
-    </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        // 2. Função auxiliar de Alerta
+        function showAlert(container, type, msg) {
+            container.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${msg}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>`;
+        }
+
+        // 3. Criar Nova Viagem
+        document.getElementById('form-viagem').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-salvar-viagem');
+            const spinner = btn.querySelector('.spinner-border');
             
-            // --- Seção: Criar Viagem (Existente) ---
-            const form = document.getElementById('form-viagem');
-            const alertContainer = document.getElementById('alert-container-viagem'); // Container do form principal
-            const submitButton = document.getElementById('btn-salvar-viagem');
-            const buttonText = submitButton.querySelector('.button-text');
-            const buttonIcon = submitButton.querySelector('.button-icon');
-            const spinner = submitButton.querySelector('.spinner-border');
+            btn.disabled = true; spinner.classList.remove('d-none');
 
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
-                setLoading(true);
+            const data = {
+                titulo: document.getElementById('titulo').value,
+                local_partida: document.getElementById('local_partida').value,
+                local_destino: document.getElementById('local_destino').value,
+                data_viagem: document.getElementById('data_viagem').value,
+                horario_estimado_partida: document.getElementById('horario_estimado_partida').value,
+                horario_estimado_volta: document.getElementById('horario_estimado_volta').value,
+                descricao: document.getElementById('descricao').value
+            };
 
-                const data = {
-                    titulo: document.getElementById('titulo').value,
-                    descricao: document.getElementById('descricao').value,
-                    local_partida: document.getElementById('local_partida').value,
-                    local_destino: document.getElementById('local_destino').value,
-                    data_viagem: document.getElementById('data_viagem').value,
-                    horario_estimado_partida: document.getElementById('horario_estimado_partida').value,
-                    horario_estimado_volta: document.getElementById('horario_estimado_volta').value
-                };
+            fetch(window.location.pathname, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+            })
+            .then(res => res.json().then(d => ({ok: res.ok, body: d})))
+            .then(r => {
+                showAlert(document.getElementById('alert-container-viagem'), r.ok ? 'success' : 'danger', r.body.message);
+                if(r.ok) { 
+                    document.getElementById('form-viagem').reset(); 
+                    setTimeout(() => window.location.reload(), 1000); 
+                }
+            })
+            .catch(() => showAlert(document.getElementById('alert-container-viagem'), 'danger', 'Erro de conexão.'))
+            .finally(() => { btn.disabled = false; spinner.classList.add('d-none'); });
+        });
 
-                fetch(window.location.pathname, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                })
-                .then(response => response.json().then(data => ({ status: response.status, body: data })))
-                .then(result => {
-                    if (result.body.success) {
-                        // Passa o container correto para o showAlert
-                        showAlert(alertContainer, 'success', result.body.message);
-                        form.reset(); 
-                        setTimeout(() => { window.location.reload(); }, 1500);
-                    } else {
-                        // Passa o container correto para o showAlert
-                        showAlert(alertContainer, 'danger', result.body.message || 'Erro ao cadastrar viagem.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro no fetch (criar viagem):', error);
-                    showAlert(alertContainer, 'danger', 'Erro de rede. Não foi possível conectar ao servidor.');
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
-            });
+        // ============================================================
+        // 4. Lógica de Atribuição com Verificação de Conflito
+        // ============================================================
+        const modal = document.getElementById('modalAtribuir');
+        const btnSalvarAtrib = document.getElementById('btn-salvar-atribuicao');
+        const alertAtrib = document.getElementById('alert-container-atribuicao');
 
-            function setLoading(isLoading) {
-                if (isLoading) {
-                    submitButton.disabled = true;
-                    spinner.style.display = 'inline-block';
-                    buttonIcon.style.display = 'none';
-                    buttonText.textContent = 'Salvando...';
+        // Ao abrir o modal
+        modal.addEventListener('show.bs.modal', function(event) {
+            const btn = event.relatedTarget;
+            document.getElementById('hidden-viagem-id').value = btn.getAttribute('data-viagem-id');
+            document.getElementById('hidden-viagem-data').value = btn.getAttribute('data-viagem-data'); // Data YYYY-MM-DD
+            document.getElementById('modal-viagem-titulo').textContent = btn.getAttribute('data-viagem-titulo');
+            
+            // Resetar o estado do modal
+            document.getElementById('select-motorista').selectedIndex = 0;
+            alertAtrib.innerHTML = '';
+            
+            // Resetar botão para estado normal
+            btnSalvarAtrib.textContent = 'Salvar Atribuição';
+            btnSalvarAtrib.classList.remove('btn-warning');
+            btnSalvarAtrib.classList.add('btn-primary');
+            btnSalvarAtrib.dataset.confimado = "false"; // Flag de controle
+        });
+
+        // Ao clicar em Salvar
+        btnSalvarAtrib.addEventListener('click', function() {
+            const idViagem = document.getElementById('hidden-viagem-id').value;
+            const idMotorista = document.getElementById('select-motorista').value;
+            const dataViagem = document.getElementById('hidden-viagem-data').value;
+
+            if (!idMotorista) {
+                showAlert(alertAtrib, 'warning', 'Selecione um motorista.');
+                return;
+            }
+
+            // Se já estiver confirmado (segundo clique), salva direto
+            if (btnSalvarAtrib.dataset.confimado === "true") {
+                enviarAtribuicao(idViagem, idMotorista);
+                return;
+            }
+
+            // 1. VERIFICAR CONFLITO NO BACKEND
+            fetch('/viagem/check-conflict', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id_motorista: idMotorista, data_viagem: dataViagem })
+            })
+            .then(r => r.json())
+            .then(resp => {
+                if (resp.has_conflict) {
+                    // CONFLITO ENCONTRADO
+                    showAlert(alertAtrib, 'warning', `
+                        <i class="bi bi-exclamation-triangle-fill"></i> <strong>Conflito de Agenda:</strong><br>
+                        ${resp.message}<br>
+                        <small>Deseja forçar a atribuição mesmo assim?</small>
+                    `);
+                    
+                    // Muda o botão para modo de confirmação
+                    btnSalvarAtrib.textContent = 'Sim, Confirmar e Salvar';
+                    btnSalvarAtrib.classList.remove('btn-primary');
+                    btnSalvarAtrib.classList.add('btn-warning');
+                    btnSalvarAtrib.dataset.confimado = "true"; // Próximo clique vai salvar
                 } else {
-                    submitButton.disabled = false;
-                    spinner.style.display = 'none';
-                    buttonIcon.style.display = 'inline-block';
-                    buttonText.textContent = 'Salvar Viagem';
+                    // Sem conflito, salva direto
+                    enviarAtribuicao(idViagem, idMotorista);
                 }
-            }
-
-            // --- FUNÇÃO DE ALERTA CORRIGIDA ---
-            // (Agora aceita o 'container' como primeiro argumento)
-            function showAlert(container, type, message) {
-                const wrapper = document.createElement('div');
-                wrapper.innerHTML = [
-                    `<div class="alert alert-${type} alert-dismissible" role="alert">`,
-                    `   <div>${message}</div>`,
-                    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
-                    '</div>'
-                ].join('');
-                container.innerHTML = ''; // Limpa o container específico
-                container.append(wrapper);
-            }
-
-            
-            // ======================================================
-            // NOVO: SCRIPT PARA (ATRIBUIR MOTORISTA)
-            // ======================================================
-            const modalAtribuir = document.getElementById('modalAtribuir');
-            const btnSalvarAtribuicao = document.getElementById('btn-salvar-atribuicao');
-            const alertContainerAtribuicao = document.getElementById('alert-container-atribuicao'); // Container do modal
-            
-            // 1. Prepara o Modal quando ele é aberto
-            modalAtribuir.addEventListener('show.bs.modal', function (event) {
-                // 'event.relatedTarget' é o botão que abriu o modal
-                const button = event.relatedTarget;
-                
-                // Pega os dados 'data-*' do botão
-                const viagemId = button.getAttribute('data-viagem-id');
-                const viagemTitulo = button.getAttribute('data-viagem-titulo');
-                
-                // Popula o modal com os dados da viagem
-                document.getElementById('hidden-viagem-id').value = viagemId;
-                document.getElementById('modal-viagem-titulo').textContent = viagemTitulo;
-                
-                // Limpa alertas antigos e reseta o select
-                alertContainerAtribuicao.innerHTML = '';
-                document.getElementById('select-motorista').selectedIndex = 0;
+            })
+            .catch(err => {
+                console.error(err);
+                showAlert(alertAtrib, 'danger', 'Erro ao verificar agenda do motorista.');
             });
+        });
 
-            // 2. Salva a Atribuição (POST para /atribuicao/)
-            btnSalvarAtribuicao.addEventListener('click', function() {
-                const idViagem = document.getElementById('hidden-viagem-id').value;
-                const idMotorista = document.getElementById('select-motorista').value;
-                
-                // Sua rota /atribuicao/ espera 'id_admin_criador'
-                const idAdminCriador = 1; // Provisório (baseado no seu service)
+        function enviarAtribuicao(idViagem, idMotorista) {
+            // Rota assumida: /atribuicao/ (conforme seu código original)
+            // Ajuste se necessário
+            const payload = {
+                id_viagem: idViagem,
+                id_motorista: idMotorista,
+                id_admin_criador: 1 // Id fixo ou vindo de sessão
+            };
 
-                if (!idMotorista) {
-                    showAlert(alertContainerAtribuicao, 'warning', 'Por favor, selecione um motorista.');
-                    return;
+            fetch('/atribuicao/', { 
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+            })
+            .then(res => res.json().then(d => ({ok: res.status === 200, body: d}))) // Seu back retorna 200 pra sucesso
+            .then(r => {
+                if (r.body.sucess || r.ok) {
+                    showAlert(alertAtrib, 'success', 'Motorista atribuído com sucesso!');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showAlert(alertAtrib, 'danger', r.body.message || 'Erro ao atribuir.');
                 }
+            })
+            .catch(() => showAlert(alertAtrib, 'danger', 'Erro de comunicação com o servidor.'));
+        }
 
-                const data = {
-                    id_motorista: idMotorista,
-                    id_viagem: idViagem,
-                    id_admin_criador: idAdminCriador
-                };
-
-                // O fetch POST para /atribuicao/
-                // (Garanta que sua rota 'atribuicao_bp' está registrada em /atribuicao)
-                fetch('/atribuicao/', { 
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                })
-                .then(response => response.json().then(data => ({ status: response.status, body: data })))
-                .then(result => {
-                    // ATENÇÃO: Sua rota /atribuicao/ retorna "sucess" (1 s)
-                    if (result.status === 200 && result.body.sucess) { 
-                        showAlert(alertContainerAtribuicao, 'success', result.body.message);
-                        
-                        // Fecha o modal e recarrega a página
-                        setTimeout(() => {
-                            const modal = bootstrap.Modal.getInstance(modalAtribuir);
-                            modal.hide();
-                            window.location.reload();
-                        }, 1500);
-
-                    } else {
-                        // Trata erros (ex: motorista já atribuído, que daria erro 500 no DB)
-                         showAlert(alertContainerAtribuicao, 'danger', result.body.message || 'Erro ao atribuir motorista.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Erro no fetch (atribuir):', error);
-                    showAlert(alertContainerAtribuicao, 'danger', 'Erro de rede. Verifique o console.');
-                });
-            });
-
-        }); // Fim do DOMContentLoaded
     </script>
 </body>
 </html>
