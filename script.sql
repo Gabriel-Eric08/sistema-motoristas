@@ -28,13 +28,19 @@ CREATE TABLE viagem (
     descricao TEXT,
     local_partida VARCHAR(200),
     local_destino VARCHAR(200),
+    
+    -- NOVAS COLUNAS --
+    distancia_km FLOAT,          -- Ex: 12.5
+    tempo_estimado VARCHAR(50),  -- Ex: "45" ou "45 min"
+    -------------------
+
     horario_estimado_partida TIME,
     horario_estimado_volta TIME,
     
-    -- Campo de Data (apenas DATE)
+    -- Campo de Data
     data_viagem DATE NOT NULL,
     
-    status VARCHAR(50) DEFAULT 'Pendente', -- Ex: Pendente, Atribuída, Concluída
+    status VARCHAR(50) DEFAULT 'Pendente', 
     
     id_admin_criador INTEGER,
     FOREIGN KEY (id_admin_criador) REFERENCES administrador (id)

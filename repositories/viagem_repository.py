@@ -1,4 +1,4 @@
-from models.models import Viagem, Atribuicao, db # <--- Adicione Atribuicao aqui
+from models.models import Viagem, Atribuicao, db 
 from datetime import time, datetime, date
 
 class ViagemRepository:
@@ -6,18 +6,30 @@ class ViagemRepository:
         viagens = Viagem.query.order_by(Viagem.data_viagem.desc()).all()
         return viagens
     
+    # --- CORREÇÃO AQUI ---
+    # Renomeei os argumentos para bater com o que o Service envia
     def create(self, titulo, descricao, local_partida, local_destino, 
-                   h_partida, h_volta, data_viagem, id_admin):
+               distancia_km, tempo_estimado, 
+               horario_estimado_partida,  # Antes era h_partida
+               horario_estimado_volta,    # Antes era h_volta
+               data_viagem, 
+               id_admin_criador):         # Antes era id_admin
         
         nova_viagem = Viagem(
             titulo=titulo,
             descricao=descricao,
             local_partida=local_partida,
             local_destino=local_destino,
-            horario_estimado_partida=h_partida,
-            horario_estimado_volta=h_volta,
+            
+            distancia_km=distancia_km,
+            tempo_estimado=tempo_estimado,
+            
+            # Agora as variáveis têm o mesmo nome
+            horario_estimado_partida=horario_estimado_partida,
+            horario_estimado_volta=horario_estimado_volta,
+            
             data_viagem=data_viagem,
-            id_admin_criador=id_admin, 
+            id_admin_criador=id_admin_criador, 
             status='Pendente'
         )
         db.session.add(nova_viagem)
@@ -31,7 +43,7 @@ class ViagemRepository:
             db.session.add(viagem)
             db.session.flush() 
             return True
-        return False # Boa prática retornar False se não achar
+        return False 
 
     def existing(self, id_viagem):
         viagem = Viagem.query.filter_by(id=id_viagem).first()
@@ -39,43 +51,29 @@ class ViagemRepository:
             return False
         return True
 
-    # --- NOVO MÉTODO PARA CORRIGIR O ERRO ---
     def get_by_motorista(self, id_motorista):
-        """
-        Busca todas as viagens associadas a um motorista específico.
-        Faz um JOIN entre a tabela Viagem e a tabela Atribuicao.
-        """
         return (db.session.query(Viagem)
                 .join(Atribuicao, Atribuicao.id_viagem == Viagem.id)
                 .filter(Atribuicao.id_motorista == id_motorista)
                 .all())
+
     def get_by_id(self, id_viagem):
-        """Busca a viagem pelo ID, trazendo relacionamentos se necessário."""
-        # O SQLAlchemy já carrega relacionamentos lazy por padrão, 
-        # mas se der erro, pode precisar de .options(joinedload(Viagem.atribuicoes))
         return Viagem.query.get(id_viagem)
+
     def search(self, status=None, id_motorista=None, data_inicio=None, data_fim=None):
-        """
-        Filtra viagens baseadas em múltiplos critérios opcionais.
-        """
         query = db.session.query(Viagem)
 
-        # 1. Filtro por Status
         if status:
             query = query.filter(Viagem.status == status)
 
-        # 2. Filtro por Motorista (Exige JOIN com Atribuicao)
         if id_motorista:
             query = query.join(Atribuicao, Atribuicao.id_viagem == Viagem.id)\
                          .filter(Atribuicao.id_motorista == id_motorista)
 
-        # 3. Filtro por Data Inicial (Maior ou igual)
         if data_inicio:
             query = query.filter(Viagem.data_viagem >= data_inicio)
 
-        # 4. Filtro por Data Final (Menor ou igual)
         if data_fim:
             query = query.filter(Viagem.data_viagem <= data_fim)
 
-        # Ordenar por data (mais recentes primeiro)
         return query.order_by(Viagem.data_viagem.desc()).all()

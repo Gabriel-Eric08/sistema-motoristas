@@ -29,11 +29,6 @@ class Administrador(db.Model):
 # --- Modelo Viagem (CORRIGIDO) ---
 
 class Viagem(db.Model):
-    """
-    Tabela CORRIGIDA.
-    Esta é a tabela do "Evento" ou "Agendamento".
-    Ela contém a DATA (separada), STATUS e quem a criou.
-    """
     __tablename__ = 'viagem'
     id = db.Column(db.Integer, primary_key=True)
     
@@ -42,20 +37,19 @@ class Viagem(db.Model):
     descricao = db.Column(db.Text, nullable=True)
     local_partida = db.Column(db.String(200))
     local_destino = db.Column(db.String(200))
+    
+    # --- NOVAS COLUNAS ---
+    distancia_km = db.Column(db.Float, nullable=True)       # Ex: 12.5
+    tempo_estimado = db.Column(db.String(50), nullable=True) # Ex: "45" ou "1h 20m"
+    # ---------------------
+
     horario_estimado_partida = db.Column(db.Time, nullable=True)
     horario_estimado_volta = db.Column(db.Time, nullable=True)
-
-    # ==================================================
-    # MUDANÇA AQUI: 'data_hora_inicio' (DateTime) virou 'data_viagem' (Date)
-    # ==================================================
     data_viagem = db.Column(db.Date, nullable=False)
-    # ==================================================
-
-    status = db.Column(db.String(50), default='Pendente') # Pendente, Atribuída, etc.
+    
+    status = db.Column(db.String(50), default='Pendente')
     id_admin_criador = db.Column(db.Integer, db.ForeignKey('administrador.id'), nullable=True)
 
-
-    # Relação: Uma Viagem (evento) pode ter um ou mais motoristas atribuídos
     atribuicoes = db.relationship('Atribuicao', backref='viagem', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):

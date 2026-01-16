@@ -56,48 +56,35 @@ class AtribuicaoService:
             return False
 
     def _enviar_notificacao_ntfy(self, motorista, viagem):
-        """
-        Método auxiliar para montar a mensagem e disparar para o ntfy.
-        """
         try:
-            # Formatação de Datas e Horas para ficar bonito na mensagem
             data_fmt = viagem.data_viagem.strftime('%d/%m/%Y')
-            
-            # Tratamento caso os horários sejam None
             hora_partida = viagem.horario_estimado_partida.strftime('%H:%M') if viagem.horario_estimado_partida else "--:--"
-            hora_volta = viagem.horario_estimado_volta.strftime('%H:%M') if viagem.horario_estimado_volta else "--:--"
             
-            # Data/Hora atual da atribuição
-            agora = datetime.now().strftime('%d/%m/%Y às %H:%M')
+            # Tratamento visual para distância e tempo
+            dist = f"{viagem.distancia_km} km" if viagem.distancia_km else "N/A"
+            tempo = f"{viagem.tempo_estimado} min" if viagem.tempo_estimado else "N/A"
             
-            # Descrição (se não tiver, coloca vazio)
             descricao = viagem.descricao if viagem.descricao else "Sem observações."
 
-            # Montagem da Mensagem Completa
+            # --- MENSAGEM COM NOVOS DADOS ---
             mensagem = (
-                f"📅 Data: {data_fmt}\n"
+                f"📅 Data: {data_fmt} às {hora_partida}\n"
                 f"📍 Rota: {viagem.local_partida} ➝ {viagem.local_destino}\n"
-                f"⏰ Horário: {hora_partida} até {hora_volta}\n"
-                f"📝 Obs: {descricao}\n"
-                f"----------------\n"
-                f"Atribuição realizada em: {agora}"
+                f"⛽ Info: {dist} | ⏱️ {tempo}\n"  # <--- NOVA LINHA
+                f"📝 Obs: {descricao}"
             )
 
-            # Envio do POST para o ntfy.sh
-            # URL: ntfy.sh/<topico_do_usuario>
             requests.post(
                 f"https://ntfy.sh/{motorista.topico_ntfy}",
                 data=mensagem.encode('utf-8'),
                 headers={
                     "Title": f"Nova Viagem: {viagem.titulo} 🚚".encode('utf-8'),
-                    "Priority": "high",  # Alta prioridade (pode vibrar/tocar som)
-                    "Tags": "car,calendar,warning" # Ícones que aparecem na notificação
+                    "Priority": "high",
+                    "Tags": "car,map"
                 },
-                timeout=5 # Timeout curto para não travar o sistema se o ntfy demorar
+                timeout=5
             )
-            print(f"Notificação enviada para {motorista.nome} no tópico {motorista.topico_ntfy}")
+            print(f"Notificação enviada para {motorista.nome}")
 
         except Exception as e:
-            # Se der erro na notificação, APENAS printa o erro. 
-            # NÃO faz rollback, pois a viagem já foi salva no banco com sucesso.
             print(f"Erro ao enviar notificação ntfy: {e}")

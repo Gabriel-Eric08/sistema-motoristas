@@ -7,49 +7,51 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+
     <style>
-        /* --- Estilos Globais e do Tema (Padrão) --- */
-        :root { --light-bg: #f8f9fa; --light-card: #ffffff; --light-text: #212529; --light-border: rgba(0, 0, 0, 0.075); --light-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05); --light-hover-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1); }
+        /* --- ESTILOS GERAIS --- */
+        :root {
+            --light-bg: #f8f9fa; --light-card: #ffffff;
+            --light-text: #212529; --light-border: rgba(0, 0, 0, 0.075);
+            --dropdown-hover: #f2f2f2;
+        }
         
-        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); color: var(--light-text); transition: background-color 0.3s ease, color 0.3s ease; }
-        
-        /* Navbar Padrão */
-        .navbar { background-color: var(--light-card); box-shadow: 0 0.125rem 0.25rem var(--light-border); }
-        @media (min-width: 992px) { .navbar .dropdown:hover .dropdown-menu { display: block; margin-top: 0; } }
-        
-        /* Tema Escuro */
-        [data-bs-theme="dark"] { --light-bg: #1a1a1a; --light-card: #282828; --light-text: #dee2e6; --light-border: rgba(255, 255, 255, 0.1); --light-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15); --light-hover-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2); }
-        
-        .theme-toggle { font-size: 1.25rem; cursor: pointer; }
-        .theme-toggle:hover { color: var(--bs-primary); }
-        [data-bs-theme="dark"] .theme-toggle .bi-sun-fill { display: none; }
-        [data-bs-theme="light"] .theme-toggle .bi-moon-stars-fill { display: none; }
-
-        /* --- Estilos Específicos desta Página --- */
-        .content-card {
-            border: none; border-radius: 0.75rem;
-            background-color: var(--light-card); box-shadow: var(--light-shadow);
+        [data-bs-theme="dark"] {
+            --light-bg: #1a1a1a; --light-card: #282828;
+            --light-text: #dee2e6; --light-border: rgba(255, 255, 255, 0.1);
+            --dropdown-hover: #343a40;
         }
 
-        /* Botão Gradiente */
-        .btn-gradient {
-            background: linear-gradient(90deg, var(--bs-primary), #0062cc);
-            border: none; color: white; transition: all 0.3s ease;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--light-bg); color: var(--light-text); transition: all 0.3s ease; }
+        
+        .content-card { border: none; border-radius: 0.75rem; background-color: var(--light-card); box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.05); }
+        .btn-gradient { background: linear-gradient(90deg, #0d6efd, #0062cc); border: none; color: white; transition: all 0.3s ease; }
         .btn-gradient:hover { transform: translateY(-2px); color: white; box-shadow: 0 4px 12px rgba(0, 98, 204, 0.3); }
 
-        /* Tabs Personalizadas */
-        .nav-tabs .nav-link { color: var(--light-text); border: none; border-bottom: 3px solid transparent; }
-        .nav-tabs .nav-link.active { color: var(--bs-primary); border-bottom: 3px solid var(--bs-primary); background: transparent; font-weight: 600; }
-        .nav-tabs .nav-link:hover { border-color: transparent; color: var(--bs-primary); }
-        
-        .table-responsive { border-radius: 0.5rem; overflow: hidden; }
-        
-        /* Ajustes de tabela no modo escuro */
-        [data-bs-theme="dark"] .table { color: var(--light-text); }
-        [data-bs-theme="dark"] .table-hover tbody tr:hover { color: var(--light-text); background-color: rgba(255,255,255,0.05); }
+        /* Navbar */
+        .navbar { background-color: var(--light-card); box-shadow: 0 0.125rem 0.25rem var(--light-border); }
+
+        /* --- AUTOCOMPLETE CSS --- */
+        .autocomplete-wrapper { position: relative; }
+        .suggestions-list {
+            position: absolute; top: 100%; left: 0; right: 0; z-index: 1050;
+            background: var(--light-card);
+            border: 1px solid var(--light-border);
+            border-radius: 0 0 8px 8px;
+            max-height: 200px; overflow-y: auto;
+            display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .suggestion-item { padding: 10px 12px; cursor: pointer; border-bottom: 1px solid var(--light-border); font-size: 0.9rem; }
+        .suggestion-item:hover { background-color: var(--dropdown-hover); }
+
+        /* Mapa */
+        #map-container { height: 400px; width: 100%; border-radius: 8px; }
+        .leaflet-routing-container { display: none !important; }
     </style>
 </head>
 <body>
@@ -64,47 +66,31 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    
-                    <li class="nav-item">
-                        <a class="nav-link fw-semibold" href="/home">
-                            <i class="bi bi-house-door-fill"></i> Dashboard
-                        </a>
-                    </li>
-
+                    <li class="nav-item"><a class="nav-link fw-semibold" href="/home"><i class="bi bi-house-door-fill"></i> Dashboard</a></li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-people-fill"></i> Motoristas
-                        </a>
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"><i class="bi bi-people-fill"></i> Motoristas</a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="/motorista/"><i class="bi bi-person-plus"></i> Cadastrar Motorista</a></li>
                             <li><a class="dropdown-item" href="/motorista/"><i class="bi bi-gear"></i> Gerenciar Motoristas</a></li>
                         </ul>
                     </li>
-
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-geo-alt-fill"></i> Viagens
-                        </a>
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown"><i class="bi bi-geo-alt-fill"></i> Viagens</a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item active" href="/viagem/"><i class="bi bi-plus-circle"></i> Cadastrar Viagem</a></li>
                             <li><a class="dropdown-item" href="/viagem/historico"><i class="bi bi-list-ul"></i> Todas as Viagens</a></li>
                         </ul>
                     </li>
-
                 </ul>
-                
                 <div class="navbar-nav me-3">
-                    <a id="theme-toggle" class="nav-link theme-toggle">
-                        <i class="bi bi-sun-fill"></i>
-                        <i class="bi bi-moon-stars-fill"></i>
+                    <a id="theme-toggle" class="nav-link theme-toggle" style="cursor: pointer;">
+                        <i class="bi bi-sun-fill" id="icon-light" style="display: none;"></i>
+                        <i class="bi bi-moon-stars-fill" id="icon-dark"></i>
                     </a>
                 </div>
-
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i> Administrador
-                        </a>
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i> Administrador</a>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li><a class="dropdown-item" href="#">Meu Perfil</a></li>
                             <li><hr class="dropdown-divider"></li>
@@ -124,23 +110,42 @@
                     <h5 class="fw-bold mb-4"><i class="bi bi-plus-circle-fill text-primary me-2"></i> Nova Viagem</h5>
                     
                     <form id="form-viagem">
+                        <input type="hidden" id="distancia_km">
+                        <input type="hidden" id="tempo_estimado">
+
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="titulo" placeholder="Título" required>
                             <label>Título da Viagem</label>
                         </div>
                         
-                        <div class="row g-2 mb-3">
-                            <div class="col-md">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="local_partida" placeholder="Partida">
-                                    <label>Partida</label>
-                                </div>
+                        <div class="mb-3 autocomplete-wrapper">
+                            <label class="form-label small fw-bold text-muted ms-1">PARTIDA</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent"><i class="bi bi-geo-alt-fill text-danger"></i></span>
+                                <input type="text" class="form-control" id="local_partida" data-lat="" data-lon="" placeholder="Digite o endereço..." autocomplete="off">
                             </div>
-                            <div class="col-md">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="local_destino" placeholder="Destino">
-                                    <label>Destino</label>
-                                </div>
+                            <div id="list-partida" class="suggestions-list"></div>
+                        </div>
+
+                        <div class="mb-3 autocomplete-wrapper">
+                            <label class="form-label small fw-bold text-muted ms-1">DESTINO</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent"><i class="bi bi-flag-fill text-success"></i></span>
+                                <input type="text" class="form-control" id="local_destino" data-lat="" data-lon="" placeholder="Digite o endereço..." autocomplete="off">
+                            </div>
+                            <div id="list-destino" class="suggestions-list"></div>
+                        </div>
+
+                        <div class="d-grid mb-3">
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalMapa">
+                                <i class="bi bi-map"></i> Calcular Distância Automática
+                            </button>
+                        </div>
+
+                        <div id="resumo-rota" class="alert alert-info d-none py-2 mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small><strong>Distância:</strong> <span id="view-dist">--</span> km</small>
+                                <small><strong>Tempo:</strong> <span id="view-time">--</span> min</small>
                             </div>
                         </div>
 
@@ -153,13 +158,13 @@
                             <div class="col-md">
                                 <div class="form-floating">
                                     <input type="time" class="form-control" id="horario_estimado_partida" required>
-                                    <label>Hora Partida</label>
+                                    <label>Saída</label>
                                 </div>
                             </div>
                             <div class="col-md">
                                 <div class="form-floating">
                                     <input type="time" class="form-control" id="horario_estimado_volta">
-                                    <label>Hora Volta</label>
+                                    <label>Volta</label>
                                 </div>
                             </div>
                         </div>
@@ -185,13 +190,13 @@
                 <div class="card content-card h-100">
                     <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
                         <ul class="nav nav-tabs card-header-tabs" id="viagensTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="pendentes-tab" data-bs-toggle="tab" data-bs-target="#pendentes" type="button" role="tab">
+                            <li class="nav-item">
+                                <button class="nav-link active" id="pendentes-tab" data-bs-toggle="tab" data-bs-target="#pendentes" type="button">
                                     <i class="bi bi-hourglass-split text-warning me-1"></i> Pendentes
                                 </button>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="atribuidas-tab" data-bs-toggle="tab" data-bs-target="#atribuidas" type="button" role="tab">
+                            <li class="nav-item">
+                                <button class="nav-link" id="atribuidas-tab" data-bs-toggle="tab" data-bs-target="#atribuidas" type="button">
                                     <i class="bi bi-check-circle-fill text-success me-1"></i> Atribuídas
                                 </button>
                             </li>
@@ -205,12 +210,7 @@
                                 <div class="table-responsive">
                                     <table class="table table-hover align-middle mb-0">
                                         <thead class="table-light">
-                                            <tr>
-                                                <th>Viagem</th>
-                                                <th>Rota</th>
-                                                <th>Data</th>
-                                                <th class="text-end" style="min-width: 140px;">Ações</th>
-                                            </tr>
+                                            <tr><th>Viagem</th><th>Rota</th><th>Data</th><th class="text-end">Ações</th></tr>
                                         </thead>
                                         <tbody>
                                             {% if not viagens_pendentes %}
@@ -223,31 +223,16 @@
                                                     <strong class="text-primary">{{ v.titulo }}</strong>
                                                     <div class="small text-muted">{{ v.descricao|truncate(20) }}</div>
                                                 </td>
-                                                <td>
-                                                    <small>{{ v.local_partida }} <i class="bi bi-arrow-right"></i> {{ v.local_destino }}</small>
-                                                </td>
-                                                <td>
-                                                    {{ v.data_viagem.strftime('%d/%m/%Y') }}<br>
-                                                    <small class="text-muted">{{ v.horario_estimado_partida }}</small>
-                                                </td>
+                                                <td><small>{{ v.local_partida }} <i class="bi bi-arrow-right"></i> {{ v.local_destino }}</small></td>
+                                                <td>{{ v.data_viagem.strftime('%d/%m/%Y') }}<br><small class="text-muted">{{ v.horario_estimado_partida }}</small></td>
                                                 <td class="text-end">
-                                                    <button class="btn btn-sm btn-outline-success me-1" 
-                                                            title="Atribuir Motorista"
-                                                            data-bs-toggle="modal" 
-                                                            data-bs-target="#modalAtribuir"
-                                                            data-viagem-id="{{ v.id }}"
-                                                            data-viagem-titulo="{{ v.titulo }}"
-                                                            data-viagem-data="{{ v.data_viagem }}">
+                                                    <button class="btn btn-sm btn-outline-success me-1" title="Atribuir Motorista" 
+                                                            data-bs-toggle="modal" data-bs-target="#modalAtribuir" 
+                                                            data-viagem-id="{{ v.id }}" data-viagem-titulo="{{ v.titulo }}" data-viagem-data="{{ v.data_viagem }}">
                                                         <i class="bi bi-person-plus-fill"></i>
                                                     </button>
-                                                    
-                                                    <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
-                                                        <i class="bi bi-pencil-fill"></i>
-                                                    </button>
-                                                    
-                                                    <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                                                        <i class="bi bi-trash-fill"></i>
-                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil-fill"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i></button>
                                                 </td>
                                             </tr>
                                             {% endfor %}
@@ -260,12 +245,7 @@
                                 <div class="table-responsive">
                                     <table class="table table-hover align-middle mb-0">
                                         <thead class="table-light">
-                                            <tr>
-                                                <th>Viagem</th>
-                                                <th>Motorista</th>
-                                                <th>Status</th>
-                                                <th class="text-end" style="min-width: 100px;">Ações</th>
-                                            </tr>
+                                            <tr><th>Viagem</th><th>Motorista</th><th>Status</th><th class="text-end">Ações</th></tr>
                                         </thead>
                                         <tbody>
                                             {% if not viagens_atribuidas %}
@@ -274,28 +254,15 @@
 
                                             {% for v in viagens_atribuidas %}
                                             <tr>
+                                                <td><span class="fw-bold">{{ v.titulo }}</span><br><small class="text-muted">{{ v.data_viagem.strftime('%d/%m') }}</small></td>
+                                                <td><i class="bi bi-person-badge text-primary"></i> {{ v.motorista_nome }}</td>
                                                 <td>
-                                                    <span class="fw-bold">{{ v.titulo }}</span><br>
-                                                    <small class="text-muted">{{ v.data_viagem.strftime('%d/%m') }}</small>
-                                                </td>
-                                                <td>
-                                                    <i class="bi bi-person-badge text-primary"></i> {{ v.motorista_nome }}
-                                                </td>
-                                                <td>
-                                                    {% if v.status == 'Concluída' %}
-                                                        <span class="badge bg-secondary">Concluída</span>
-                                                    {% else %}
-                                                        <span class="badge bg-success">Atribuída</span>
-                                                    {% endif %}
+                                                    {% if v.status == 'Concluída' %}<span class="badge bg-secondary">Concluída</span>
+                                                    {% else %}<span class="badge bg-success">Atribuída</span>{% endif %}
                                                 </td>
                                                 <td class="text-end">
-                                                    <button class="btn btn-sm btn-outline-primary me-1" title="Editar">
-                                                        <i class="bi bi-pencil-fill"></i>
-                                                    </button>
-
-                                                    <button class="btn btn-sm btn-outline-danger" title="Excluir">
-                                                        <i class="bi bi-trash-fill"></i>
-                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-primary me-1"><i class="bi bi-pencil-fill"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash-fill"></i></button>
                                                 </td>
                                             </tr>
                                             {% endfor %}
@@ -308,9 +275,29 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </main>
+
+    <div class="modal fade" id="modalMapa" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Calcular Rota</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div id="map-container"></div>
+                    <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
+                        <span id="map-status" class="small text-muted">Aguardando...</span>
+                        <div>
+                            <button class="btn btn-secondary btn-sm me-2" onclick="limparMapa()">Limpar</button>
+                            <button class="btn btn-primary btn-sm" id="btn-confirmar-mapa" disabled>Confirmar Distância</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="modal fade" id="modalAtribuir" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
@@ -337,7 +324,6 @@
                             </select>
                             <label>Escolha o Motorista</label>
                         </div>
-                        
                         <div id="alert-container-atribuicao"></div>
                     </form>
                 </div>
@@ -350,48 +336,160 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // 1. Lógica de Tema (Atualizada para a nova Navbar)
-        (function() {
-            const applyTheme = (theme) => document.documentElement.setAttribute('data-bs-theme', theme);
-            const toggleIcon = (theme) => {
-                const toggle = document.getElementById('theme-toggle');
-                if (toggle) {
-                    toggle.querySelector('.bi-sun-fill').style.display = theme === 'dark' ? 'none' : 'block';
-                    toggle.querySelector('.bi-moon-stars-fill').style.display = theme === 'dark' ? 'block' : 'none';
-                }
-            };
-            const getPreferredTheme = () => localStorage.getItem('theme') || 'light';
-            
-            const currentTheme = getPreferredTheme();
-            applyTheme(currentTheme);
-            
-            document.addEventListener('DOMContentLoaded', () => {
-                toggleIcon(currentTheme);
-                const themeToggle = document.getElementById('theme-toggle');
-                if (themeToggle) {
-                    themeToggle.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const newTheme = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
-                        localStorage.setItem('theme', newTheme);
-                        applyTheme(newTheme);
-                        toggleIcon(newTheme);
-                    });
-                }
-            });
-        })();
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 
-        // 2. Função auxiliar de Alerta
-        function showAlert(container, type, msg) {
-            container.innerHTML = `
-                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                    ${msg}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>`;
+    <script>
+        // --- 1. TEMA (DARK/LIGHT) ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const iconDark = document.getElementById('icon-dark');
+        const iconLight = document.getElementById('icon-light');
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('theme', theme);
+            if (theme === 'dark') {
+                iconDark.style.display = 'none'; iconLight.style.display = 'inline-block';
+            } else {
+                iconDark.style.display = 'inline-block'; iconLight.style.display = 'none';
+            }
+        }
+        setTheme(localStorage.getItem('theme') || 'light');
+        if(themeToggle) {
+            themeToggle.addEventListener('click', () => setTheme(document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark'));
         }
 
-        // 3. Criar Nova Viagem
+        // --- 2. AUXILIARES ---
+        function showAlert(container, type, msg) {
+            container.innerHTML = `<div class="alert alert-${type} alert-dismissible fade show">${msg}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>`;
+        }
+
+        function montarEnderecoCurto(item) {
+            const addr = item.address;
+            const rua = addr.road || addr.pedestrian || addr.suburb || item.name.split(',')[0];
+            const bairro = addr.suburb || addr.neighbourhood || addr.residential || '';
+            const cidade = addr.city || addr.town || addr.municipality || addr.village || '';
+            const estado = addr.state || '';
+
+            let partes = [];
+            if (rua) partes.push(rua);
+            if (bairro && bairro !== rua) partes.push(bairro);
+            if (cidade) partes.push(cidade);
+            if (estado) partes.push(estado);
+            return partes.join(', ');
+        }
+
+        // --- 3. AUTOCOMPLETE INTELIGENTE ---
+        function setupAutocomplete(inputId, listId) {
+            const input = document.getElementById(inputId);
+            const list = document.getElementById(listId);
+            let timeout = null;
+
+            input.addEventListener('input', function() {
+                const query = this.value;
+                input.dataset.lat = ""; input.dataset.lon = ""; 
+                
+                clearTimeout(timeout);
+                if (query.length < 3) { list.style.display = 'none'; return; }
+
+                timeout = setTimeout(async () => {
+                    try {
+                        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=br&limit=5&addressdetails=1`;
+                        const res = await fetch(url);
+                        const data = await res.json();
+
+                        list.innerHTML = '';
+                        if (data.length > 0) {
+                            list.style.display = 'block';
+                            data.forEach(item => {
+                                const enderecoLimpo = montarEnderecoCurto(item);
+                                const div = document.createElement('div');
+                                div.className = 'suggestion-item';
+                                div.innerHTML = `<i class="bi bi-geo-alt text-muted me-2"></i><strong>${(item.address.road || item.name)}</strong><small style="display:block; margin-left: 24px; color:#666;">${enderecoLimpo}</small>`;
+                                
+                                div.addEventListener('click', () => {
+                                    input.value = enderecoLimpo; 
+                                    input.dataset.lat = item.lat;
+                                    input.dataset.lon = item.lon;
+                                    list.style.display = 'none';
+                                    input.focus();
+                                });
+                                list.appendChild(div);
+                            });
+                        } else { list.style.display = 'none'; }
+                    } catch (e) { console.error(e); }
+                }, 400);
+            });
+            document.addEventListener('click', (e) => { if(e.target !== input && e.target !== list) list.style.display = 'none'; });
+        }
+        setupAutocomplete('local_partida', 'list-partida');
+        setupAutocomplete('local_destino', 'list-destino');
+
+        // --- 4. MAPA LEAFLET ---
+        let map, control;
+        let rotaCalculada = {};
+        const modalMapa = document.getElementById('modalMapa');
+
+        modalMapa.addEventListener('shown.bs.modal', function () {
+            if (!map) {
+                map = L.map('map-container').setView([-23.5505, -46.6333], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM' }).addTo(map);
+                
+                control = L.Routing.control({
+                    waypoints: [null, null],
+                    routeWhileDragging: false, show: false, addWaypoints: false,
+                    lineOptions: { styles: [{color: '#0d6efd', opacity: 0.7, weight: 6}] }
+                }).addTo(map);
+
+                control.on('routesfound', function(e) {
+                    const r = e.routes[0];
+                    const km = (r.summary.totalDistance / 1000).toFixed(1);
+                    const min = Math.round(r.summary.totalTime / 60);
+                    rotaCalculada = { km, min };
+                    document.getElementById('map-status').innerHTML = `<strong class="text-success">Rota: ${km} km / ${min} min</strong>`;
+                    document.getElementById('btn-confirmar-mapa').disabled = false;
+                });
+                
+                map.on('click', function(e) {
+                    const wps = control.getWaypoints();
+                    if (!wps[0].latLng) control.spliceWaypoints(0, 1, e.latlng);
+                    else if (!wps[1].latLng) control.spliceWaypoints(1, 1, e.latlng);
+                    else { control.setWaypoints([null, null]); control.spliceWaypoints(0, 1, e.latlng); }
+                });
+            }
+            
+            setTimeout(() => {
+                map.invalidateSize();
+                const latP = document.getElementById('local_partida').dataset.lat;
+                const lonP = document.getElementById('local_partida').dataset.lon;
+                const latD = document.getElementById('local_destino').dataset.lat;
+                const lonD = document.getElementById('local_destino').dataset.lon;
+
+                if (latP && lonP && latD && lonD) {
+                    document.getElementById('map-status').innerHTML = "<span class='text-primary'>Calculando rota automática...</span>";
+                    control.setWaypoints([L.latLng(latP, lonP), L.latLng(latD, lonD)]);
+                } else {
+                    document.getElementById('map-status').innerText = "Clique no mapa para definir Origem e Destino.";
+                }
+            }, 300);
+        });
+
+        function limparMapa() {
+            if(control) control.setWaypoints([null, null]);
+            document.getElementById('btn-confirmar-mapa').disabled = true;
+            document.getElementById('map-status').innerText = "Mapa limpo.";
+        }
+
+        document.getElementById('btn-confirmar-mapa').addEventListener('click', function() {
+            document.getElementById('distancia_km').value = rotaCalculada.km;
+            document.getElementById('tempo_estimado').value = rotaCalculada.min;
+            document.getElementById('view-dist').innerText = rotaCalculada.km;
+            document.getElementById('view-time').innerText = rotaCalculada.min;
+            document.getElementById('resumo-rota').classList.remove('d-none');
+            bootstrap.Modal.getInstance(modalMapa).hide();
+        });
+
+        // --- 5. SALVAR VIAGEM (BACKEND) ---
         document.getElementById('form-viagem').addEventListener('submit', function(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-salvar-viagem');
@@ -403,6 +501,8 @@
                 titulo: document.getElementById('titulo').value,
                 local_partida: document.getElementById('local_partida').value,
                 local_destino: document.getElementById('local_destino').value,
+                distancia_km: document.getElementById('distancia_km').value,
+                tempo_estimado: document.getElementById('tempo_estimado').value,
                 data_viagem: document.getElementById('data_viagem').value,
                 horario_estimado_partida: document.getElementById('horario_estimado_partida').value,
                 horario_estimado_volta: document.getElementById('horario_estimado_volta').value,
@@ -424,103 +524,71 @@
             .finally(() => { btn.disabled = false; spinner.classList.add('d-none'); });
         });
 
-        // ============================================================
-        // 4. Lógica de Atribuição com Verificação de Conflito
-        // ============================================================
-        const modal = document.getElementById('modalAtribuir');
+        // --- 6. ATRIBUIÇÃO DE MOTORISTA (BACKEND + CONFLITO) ---
+        const modalAtribuir = document.getElementById('modalAtribuir');
         const btnSalvarAtrib = document.getElementById('btn-salvar-atribuicao');
         const alertAtrib = document.getElementById('alert-container-atribuicao');
 
-        // Ao abrir o modal
-        modal.addEventListener('show.bs.modal', function(event) {
+        modalAtribuir.addEventListener('show.bs.modal', function(event) {
             const btn = event.relatedTarget;
             document.getElementById('hidden-viagem-id').value = btn.getAttribute('data-viagem-id');
-            document.getElementById('hidden-viagem-data').value = btn.getAttribute('data-viagem-data'); // Data YYYY-MM-DD
+            document.getElementById('hidden-viagem-data').value = btn.getAttribute('data-viagem-data');
             document.getElementById('modal-viagem-titulo').textContent = btn.getAttribute('data-viagem-titulo');
-            
-            // Resetar o estado do modal
             document.getElementById('select-motorista').selectedIndex = 0;
             alertAtrib.innerHTML = '';
-            
-            // Resetar botão para estado normal
             btnSalvarAtrib.textContent = 'Salvar Atribuição';
-            btnSalvarAtrib.classList.remove('btn-warning');
-            btnSalvarAtrib.classList.add('btn-primary');
-            btnSalvarAtrib.dataset.confimado = "false"; // Flag de controle
+            btnSalvarAtrib.classList.replace('btn-warning', 'btn-primary');
+            btnSalvarAtrib.dataset.confimado = "false";
         });
 
-        // Ao clicar em Salvar
         btnSalvarAtrib.addEventListener('click', function() {
             const idViagem = document.getElementById('hidden-viagem-id').value;
             const idMotorista = document.getElementById('select-motorista').value;
             const dataViagem = document.getElementById('hidden-viagem-data').value;
 
-            if (!idMotorista) {
-                showAlert(alertAtrib, 'warning', 'Selecione um motorista.');
-                return;
-            }
+            if (!idMotorista) { showAlert(alertAtrib, 'warning', 'Selecione um motorista.'); return; }
 
-            // Se já estiver confirmado (segundo clique), salva direto
+            // Se já confirmou o conflito, envia direto
             if (btnSalvarAtrib.dataset.confimado === "true") {
                 enviarAtribuicao(idViagem, idMotorista);
                 return;
             }
 
-            // 1. VERIFICAR CONFLITO NO BACKEND
+            // Checa conflito
             fetch('/viagem/check-conflict', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                method: 'POST', headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ id_motorista: idMotorista, data_viagem: dataViagem })
             })
             .then(r => r.json())
             .then(resp => {
                 if (resp.has_conflict) {
-                    // CONFLITO ENCONTRADO
-                    showAlert(alertAtrib, 'warning', `
-                        <i class="bi bi-exclamation-triangle-fill"></i> <strong>Conflito de Agenda:</strong><br>
-                        ${resp.message}<br>
-                        <small>Deseja forçar a atribuição mesmo assim?</small>
-                    `);
-                    
-                    // Muda o botão para modo de confirmação
-                    btnSalvarAtrib.textContent = 'Sim, Confirmar e Salvar';
-                    btnSalvarAtrib.classList.remove('btn-primary');
-                    btnSalvarAtrib.classList.add('btn-warning');
-                    btnSalvarAtrib.dataset.confimado = "true"; // Próximo clique vai salvar
+                    showAlert(alertAtrib, 'warning', `<i class="bi bi-exclamation-triangle-fill"></i> <strong>Conflito:</strong> ${resp.message} <br><small>Confirmar mesmo assim?</small>`);
+                    btnSalvarAtrib.textContent = 'Sim, Confirmar';
+                    btnSalvarAtrib.classList.replace('btn-primary', 'btn-warning');
+                    btnSalvarAtrib.dataset.confimado = "true";
                 } else {
-                    // Sem conflito, salva direto
                     enviarAtribuicao(idViagem, idMotorista);
                 }
             })
-            .catch(err => {
-                console.error(err);
-                showAlert(alertAtrib, 'danger', 'Erro ao verificar agenda do motorista.');
-            });
+            .catch(err => { console.error(err); showAlert(alertAtrib, 'danger', 'Erro na verificação.'); });
         });
 
         function enviarAtribuicao(idViagem, idMotorista) {
-            // Rota assumida: /atribuicao/ (conforme seu código original)
-            const payload = {
-                id_viagem: idViagem,
-                id_motorista: idMotorista,
-                id_admin_criador: 1 // Id fixo ou vindo de sessão
-            };
-
-            fetch('/atribuicao/', { 
-                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
+            fetch('/viagem/atribuir', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id_viagem: idViagem, id_motorista: idMotorista })
             })
-            .then(res => res.json().then(d => ({ok: res.status === 200, body: d})))
-            .then(r => {
-                if (r.body.sucess || r.ok) {
-                    showAlert(alertAtrib, 'success', 'Motorista atribuído com sucesso!');
-                    setTimeout(() => window.location.reload(), 1000);
+            .then(r => r.json().then(d => ({ok: r.ok, body: d})))
+            .then(res => {
+                if(res.ok) {
+                    bootstrap.Modal.getInstance(modalAtribuir).hide();
+                    window.location.reload();
                 } else {
-                    showAlert(alertAtrib, 'danger', r.body.message || 'Erro ao atribuir.');
+                    showAlert(alertAtrib, 'danger', res.body.message);
                 }
             })
-            .catch(() => showAlert(alertAtrib, 'danger', 'Erro de comunicação com o servidor.'));
+            .catch(() => showAlert(alertAtrib, 'danger', 'Erro ao atribuir.'));
         }
-
     </script>
 </body>
 </html>
